@@ -14,7 +14,7 @@ tickerG = 'GOOGL'
 tickerA = 'AAPL'
 tickerM = 'MSFT'
 tickerT = 'TSM'
-start_date = '2020-01-01'
+start_date = '2000-01-01'
 end_date = date.today().strftime("%Y-%m-%d")
 dataG = yf.download(tickerG, start_date, end_date)
 dataA = yf.download(tickerA, start_date, end_date)
@@ -25,6 +25,7 @@ dataT = yf.download(tickerT, start_date, end_date)
 #dataG.to_csv("APPL.csv")
 #dataG.to_csv("MSFT.csv")
 #dataG.to_csv("TSM.csv")
+#--------------------------------------------------------------------
 
 #print(dataG)
 #print(yf.Ticker(tickerT).info.keys())
@@ -42,6 +43,8 @@ dataT = yf.download(tickerT, start_date, end_date)
 #mplt.xlabel('Date', fontsize = 18)
 #mplt.ylabel('Close Price USD($)', fontsize=18)
 #mplt.show()
+
+
 #---------------- prescale for training ----------------
 data_filtered = dataG.filter(['Close'])
 data_set = data_filtered.values
@@ -104,3 +107,21 @@ predictions = scaler.inverse_transform(predictions)
 #-------------- evaluate model ----------------
 
 rm = np.sqrt(np.mean(predictions - y_test)**2)
+
+#-------------- plot the prediction ----------------
+
+train = dataG[:training_data_len]
+valid = dataG[training_data_len:]
+valid['Predictions'] = predictions
+
+#-------------- visualize prediction ------------------
+
+mplt.figure(figsize=(16,8))
+mplt.title('Model')
+mplt.xlabel('Date', fontsize=18)
+mplt.ylabel('Close Price USD', fontsize=18)
+mplt.plot(train['Close'])
+mplt.plot(valid[['Close', 'Predictions']])
+
+mplt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
+mplt.show()
