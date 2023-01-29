@@ -82,7 +82,7 @@ print(data_set)
 model.compile(optimizer='adam', loss='mean_squared_error')
 
 #--------------- train Model ----------------
-history = model.fit(x_train, y_train, batch_size=1, epochs=3)
+history = model.fit(x_train, y_train, batch_size=1, epochs=30)
 
 print(history.history.keys())
 train_loss = history.history['loss']
