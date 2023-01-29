@@ -3,10 +3,10 @@ from datetime import date
 from sklearn.preprocessing import MinMaxScaler      #### scicit-learn to normalize data ####
 from keras.layers import LSTM, Dense                ####LSTM as model to train time sensitive data and make reliable data analysis in this training
 from keras.models import Sequential
-import pandas as pd
 import yfinance as yf                               #### Yahoo Finance Api ####
 import numpy as np
 import matplotlib.pyplot as mplt
+#import pandas as pd      #### first approach to download and convert data into a csv wtih pandas
 
 
 #---------------- preamble set tickers ----------------
@@ -20,11 +20,13 @@ dataG = yf.download(tickerG, start_date, end_date)
 #dataA = yf.download(tickerA, start_date, end_date)
 #dataM = yf.download(tickerM, start_date, end_date)
 #dataT = yf.download(tickerT, start_date, end_date)
-#--------------- uncomment if u need csv initially ------------------
+#--------------- uncomment if u need csv initially with pandas ------------------
 #dataG.to_csv("GOOGL.csv")
 #dataG.to_csv("APPL.csv")
 #dataG.to_csv("MSFT.csv")
 #dataG.to_csv("TSM.csv")
+
+## data_frame = pd.read_csv('/path/to/CSV_FILE.csv')
 #--------------------------------------------------------------------
 
 #print(dataG)
@@ -69,20 +71,22 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 #--------------- reshaping data ---------------
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-x_train.shape
+#x_train.shape
 
 model = Sequential()
 model.add(LSTM(50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
 model.add(LSTM(50, return_sequences=False))
 model.add(Dense(25))
 model.add(Dense(1))
-
-model.compile(optimizer='adam', loss= 'mean_squared_error', metrics=['accuracy'])
+print(data_set)
+model.compile(optimizer='adam', loss='mean_squared_error')
 
 #--------------- train Model ----------------
 history = model.fit(x_train, y_train, batch_size=1, epochs=3)
+
 print(history.history.keys())
-train_loss = history.history['accuracy']
+train_loss = history.history['loss']
+train_acc = history.history['accuracy']
 #--------------- verification ---------------
 
 verification = scaled_training_data[training_data_len - 60:, :]
@@ -123,14 +127,19 @@ mplt.xlabel('Date', fontsize=18)
 mplt.ylabel('Close Price USD', fontsize=18)
 mplt.plot(train['Close'])
 mplt.plot(valid[['Close', 'Predictions']])
-
 mplt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
 mplt.show()
-
-epochs = range(1,3)
-mplt.plot(epochs, train_loss, 'g', label='Training accuracy')
-mplt.title('Training and validation loss')
-mplt.xlabel('Epochs')
-mplt.ylabel('Loss')
-mplt.legend()
+#------------------ visualize accuracy and loss of model -------------------------
+mplt.plot(train_loss)
+mplt.title('model loss')
+mplt.ylabel('loss')
+mplt.xlabel('epoch')
+mplt.legend(['train', 'test'], loc='upper left')
 mplt.show()
+
+
+#---------------- BEMERKUNGEN -------------------
+# Ich habe es versucht die Genuaigkeit mit metrics=['accuracy'] auszulesen. Doch ich habe herausgefunden,
+# dass die accuracy nicht ausgelesen werden kann, da es eine Klassifikationsmetrik ist und ich mit Regression arbeite.
+# Daher kam jedes Mal eine Accuracy 0 oder NaN raus. Auch nach viel probieren und Recherche kam ich nicht zu einer
+# Lösung zum Plotten der Genauigkeit des Models.
