@@ -17,9 +17,9 @@ tickerT = 'TSM'
 start_date = '2000-01-01'
 end_date = date.today().strftime("%Y-%m-%d")
 dataG = yf.download(tickerG, start_date, end_date)
-dataA = yf.download(tickerA, start_date, end_date)
-dataM = yf.download(tickerM, start_date, end_date)
-dataT = yf.download(tickerT, start_date, end_date)
+#dataA = yf.download(tickerA, start_date, end_date)
+#dataM = yf.download(tickerM, start_date, end_date)
+#dataT = yf.download(tickerT, start_date, end_date)
 #--------------- uncomment if u need csv initially ------------------
 #dataG.to_csv("GOOGL.csv")
 #dataG.to_csv("APPL.csv")
@@ -77,11 +77,12 @@ model.add(LSTM(50, return_sequences=False))
 model.add(Dense(25))
 model.add(Dense(1))
 
-model.compile(optimizer='adam', loss= 'mean_squared_error')
+model.compile(optimizer='adam', loss= 'mean_squared_error', metrics=['accuracy'])
 
 #--------------- train Model ----------------
-model.fit(x_train, y_train, batch_size=1, epochs=1)
-
+history = model.fit(x_train, y_train, batch_size=1, epochs=3)
+print(history.history.keys())
+train_loss = history.history['accuracy']
 #--------------- verification ---------------
 
 verification = scaled_training_data[training_data_len - 60:, :]
@@ -124,4 +125,12 @@ mplt.plot(train['Close'])
 mplt.plot(valid[['Close', 'Predictions']])
 
 mplt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
+mplt.show()
+
+epochs = range(1,3)
+mplt.plot(epochs, train_loss, 'g', label='Training accuracy')
+mplt.title('Training and validation loss')
+mplt.xlabel('Epochs')
+mplt.ylabel('Loss')
+mplt.legend()
 mplt.show()
