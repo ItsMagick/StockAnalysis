@@ -1,7 +1,7 @@
 import math
 from datetime import date
 from sklearn.preprocessing import MinMaxScaler      #### scicit-learn to normalize data ####
-from keras.layers import LSTM, Dense                ####LSTM as model to train time sensitive data and make reliable data analysis in this training
+from keras.layers import LSTM, Dense                ####LSTM as model to train time sensitive data and make reliable data prediction in this training
 from keras.models import Sequential
 import yfinance as yf                               #### Yahoo Finance Api ####
 import numpy as np
@@ -86,7 +86,6 @@ history = model.fit(x_train, y_train, batch_size=1, epochs=30)
 
 print(history.history.keys())
 train_loss = history.history['loss']
-train_acc = history.history['accuracy']
 #--------------- verification ---------------
 
 verification = scaled_training_data[training_data_len - 60:, :]
